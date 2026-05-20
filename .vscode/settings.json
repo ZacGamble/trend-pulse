@@ -1,0 +1,7 @@
+{
+  "python.defaultInterpreterPath": "${workspaceFolder}/engine/.venv/bin/python",
+  "python.analysis.extraPaths": [
+    "${workspaceFolder}/engine"
+  ],
+  "python.analysis.typeCheckingMode": "basic"
+}

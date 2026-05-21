@@ -80,7 +80,7 @@ export async function createKeyword(formData: FormData) {
   }
 
   revalidatePath("/dashboard/keywords");
-  redirect("/dashboard/keywords");
+  return { success: true };
 }
 
 export async function deleteKeyword(keywordId: number) {
@@ -105,4 +105,18 @@ export async function deleteKeyword(keywordId: number) {
   }
 
   revalidatePath("/dashboard/keywords");
+}
+
+export async function triggerEngineScrape() {
+  try {
+    const cronSecret = process.env.CRON_SECRET || "";
+    await fetch("https://trend-pulse-production.up.railway.app/api/v1/cron-check", {
+      method: "POST",
+      headers: {
+        "x-cron-secret": cronSecret,
+      },
+    });
+  } catch (e) {
+    console.error("Failed to trigger engine scrape:", e);
+  }
 }

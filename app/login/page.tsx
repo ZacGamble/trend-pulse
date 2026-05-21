@@ -24,9 +24,24 @@ export default function LoginPage() {
   async function handleGoogleSignIn() {
     setLoading(true);
     setError(null);
-    const result = await signInWithGoogle();
-    if (result?.error) {
-      setError(result.error);
+    
+    // We use the browser client directly here to avoid Server Action PKCE cookie bugs
+    const { createClient } = await import("@/lib/supabase/client");
+    const supabase = createClient();
+    
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+        queryParams: {
+          access_type: "offline",
+          prompt: "consent",
+        },
+      },
+    });
+
+    if (error) {
+      setError(error.message);
       setLoading(false);
     }
   }

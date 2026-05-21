@@ -1,5 +1,20 @@
 from pydantic_settings import BaseSettings
 from typing import Optional
+import os
+import sys
+
+# Startup diagnostic — print which required env vars are present
+_REQUIRED = [
+    "SUPABASE_URL", "SUPABASE_SERVICE_ROLE_KEY",
+    "UPSTASH_REDIS_REST_URL", "UPSTASH_REDIS_REST_TOKEN",
+    "CRON_SECRET",
+]
+print("=== TrendPulse Config Diagnostic ===", file=sys.stderr)
+for var in _REQUIRED:
+    present = var in os.environ
+    print(f"  {var}: {'SET' if present else 'MISSING'}", file=sys.stderr)
+print(f"  PORT: {os.environ.get('PORT', 'NOT SET')}", file=sys.stderr)
+print("====================================", file=sys.stderr)
 
 
 class Settings(BaseSettings):
@@ -35,3 +50,4 @@ class Settings(BaseSettings):
 
 
 settings = Settings()  # type: ignore[call-arg]
+

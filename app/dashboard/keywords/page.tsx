@@ -99,7 +99,14 @@ export default async function KeywordsPage() {
                     })}
                   </p>
                 </div>
-                <DeleteKeywordButton keywordId={keyword.id} />
+                <div className="flex items-center gap-2">
+                  <Link href={`/dashboard/keywords/${keyword.id}/edit`}>
+                    <Button variant="secondary" className="h-9 px-3 text-xs">
+                      Edit
+                    </Button>
+                  </Link>
+                  <DeleteKeywordButton keywordId={keyword.id} />
+                </div>
               </div>
             </Card>
           ))}

@@ -81,6 +81,57 @@ export async function createKeyword(formData: FormData) {
   return { success: true };
 }
 
+export async function updateKeyword(keywordId: number, formData: FormData) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "You must be logged in." };
+  }
+
+  const phrase = formData.get("phrase") as string;
+  const subredditsRaw = formData.get("target_subreddits") as string;
+  const rawWebhook = formData.get("discord_webhook_url") as string;
+  const discordWebhookUrl = rawWebhook?.trim() ? rawWebhook.trim() : null;
+
+  if (!phrase?.trim()) {
+    return { error: "Keyword phrase is required." };
+  }
+  if (!subredditsRaw?.trim()) {
+    return { error: "At least one target subreddit is required." };
+  }
+
+  // Parse comma-separated subreddits into a clean array
+  const targetSubreddits = subredditsRaw
+    .split(",")
+    .map((s) => s.trim().replace(/^r\//, ""))
+    .filter(Boolean);
+
+  if (targetSubreddits.length === 0) {
+    return { error: "At least one valid target subreddit is required." };
+  }
+
+  const { error } = await supabase
+    .from("keywords")
+    .update({
+      phrase: phrase.trim(),
+      target_subreddits: targetSubreddits,
+      discord_webhook_url: discordWebhookUrl,
+    })
+    .eq("id", keywordId)
+    .eq("user_id", user.id);
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  // No redirect here because we want the client to trigger the scrape first
+  return { success: true };
+}
+
 export async function deleteKeyword(keywordId: number) {
   const supabase = await createClient();
 

@@ -103,20 +103,17 @@ Routes:
 - Create a Redis database at [upstash.com](https://upstash.com)
 - Copy the REST URL and token for the engine env vars
 
-### 3. Reddit API
-- Register an app at [reddit.com/prefs/apps](https://reddit.com/prefs/apps) (type: "script")
-- Copy client ID and secret for the engine env vars
-
-### 4. Engine Deployment
+### 3. Engine Deployment
 - Deploy `engine/` to Render (use `render.yaml` blueprint) or Railway
 - Set all env vars listed in `engine/config.py`
+- **No Reddit API key needed** — the engine scrapes public JSON feeds (`reddit.com/r/{sub}/new.json`)
 
-### 5. Cron Job
+### 4. Cron Job
 - Register at [cron-job.org](https://cron-job.org)
 - Create a POST job targeting `https://<engine-host>/api/v1/cron-check`
 - Set header `X-Cron-Secret: <your-secret>`
 - Schedule: every 5 minutes
 
-### 6. Frontend Deployment
+### 5. Frontend Deployment
 - Connect the repo to Vercel
 - Set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` in Vercel env vars

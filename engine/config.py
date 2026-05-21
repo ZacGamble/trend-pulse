@@ -20,9 +20,8 @@ class Settings(BaseSettings):
     # Cron authentication
     CRON_SECRET: str
 
-    # Reddit API credentials
-    REDDIT_CLIENT_ID: str
-    REDDIT_CLIENT_SECRET: str
+    # Reddit public JSON scraping (no API key needed)
+    # A descriptive user agent is required — Reddit blocks default/empty agents
     REDDIT_USER_AGENT: str = "TrendPulse/1.0 (automated lead detector)"
 
     # The moat — proprietary keyword weights and phrases

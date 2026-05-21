@@ -16,10 +16,6 @@ services:
         sync: false
       - key: CRON_SECRET
         sync: false
-      - key: REDDIT_CLIENT_ID
-        sync: false
-      - key: REDDIT_CLIENT_SECRET
-        sync: false
       - key: KEYWORD_REGEX_WEIGHTS
         sync: false
       - key: HIGH_INTENT_PHRASES

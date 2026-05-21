@@ -43,7 +43,7 @@ export async function signup(formData: FormData) {
 
 export async function signInWithGoogle() {
   const supabase = await createClient();
-  let url = process.env.NEXT_PUBLIC_SITE_URL ?? process.env.NEXT_PUBLIC_VERCEL_URL ?? "http://localhost:3000";
+  let url = process.env.NEXT_PUBLIC_SITE_URL ?? process.env.VERCEL_URL ?? "http://localhost:3000";
   url = url.startsWith("http") ? url : `https://${url}`;
   url = url.replace(/\/$/, ""); // ensure no trailing slash
   const redirectTo = `${url}/auth/callback`;

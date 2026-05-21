@@ -7,9 +7,10 @@ import { createClient } from "@/lib/supabase/server";
 async function validateSubreddits(subreddits: string[]): Promise<string | null> {
   for (const sub of subreddits) {
     try {
-      const response = await fetch(`https://www.reddit.com/r/${sub}/about.json`, {
+      const response = await fetch(`https://www.reddit.com/r/${sub}/new.json?limit=1&raw_json=1`, {
         headers: {
-          "User-Agent": "TrendPulse/1.0.0 (Validation Check)",
+          "User-Agent": "TrendPulse/1.0 (automated lead detector)",
+          "Accept": "application/json",
         },
         redirect: "manual", // Prevent following the 302 search redirect for missing subs
       });
@@ -25,7 +26,7 @@ async function validateSubreddits(subreddits: string[]): Promise<string | null> 
       }
 
       const data = await response.json();
-      if (data.kind !== "t5") {
+      if (data.kind !== "Listing") {
         return `Subreddit "r/${sub}" does not appear to be a valid, public community.`;
       }
     } catch (e) {

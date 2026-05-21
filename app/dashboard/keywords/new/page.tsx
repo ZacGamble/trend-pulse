@@ -101,14 +101,18 @@ export default function NewKeywordPage() {
             </p>
           </div>
 
-          <Input
-            label="Discord Webhook URL"
-            name="discord_webhook_url"
-            type="url"
-            placeholder="https://discord.com/api/webhooks/..."
-            required
-            disabled={loadingStep !== "idle"}
-          />
+          <div className="flex flex-col gap-1.5">
+            <Input
+              label="Discord Webhook URL"
+              name="discord_webhook_url"
+              type="url"
+              placeholder="https://discord.com/api/webhooks/..."
+              disabled={loadingStep !== "idle"}
+            />
+            <p className="text-xs text-muted">
+              (Optional) Get instant alerts in Discord when a lead is found.
+            </p>
+          </div>
 
           <div className="flex items-center gap-3 pt-2">
             <Button type="submit" disabled={loadingStep !== "idle"}>

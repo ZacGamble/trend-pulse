@@ -47,7 +47,7 @@ export default function Home() {
 
           <p className="animate-fade-in delay-200 mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">
             TrendPulse monitors Reddit in real-time, matches posts against your
-            keywords, and sends instant Discord alerts — so you never miss a
+            keywords, and surfaces them instantly in your dashboard — so you never miss a
             high-intent lead.
           </p>
 

@@ -110,14 +110,16 @@ async def cron_check(x_cron_secret: str = Header(...)):
                         f"MATCH: '{kw['phrase']}' in r/{post['subreddit']} — {post['title'][:60]}"
                     )
 
-                    # Fire Discord webhook
-                    await send_discord_alert(
-                        webhook_url=kw["discord_webhook_url"],
-                        keyword_phrase=kw["phrase"],
-                        post_title=post["title"],
-                        post_permalink=post["permalink"],
-                        subreddit=post["subreddit"],
-                    )
+                    # Fire Discord webhook if configured
+                    webhook = kw.get("discord_webhook_url")
+                    if webhook:
+                        await send_discord_alert(
+                            webhook_url=webhook,
+                            keyword_phrase=kw["phrase"],
+                            post_title=post["title"],
+                            post_permalink=post["permalink"],
+                            subreddit=post["subreddit"],
+                        )
 
     logger.info(
         f"Cycle complete — processed {len(all_posts)} posts, {total_matches} new matches"

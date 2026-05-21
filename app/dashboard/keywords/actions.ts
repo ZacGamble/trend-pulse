@@ -39,16 +39,14 @@ export async function createKeyword(formData: FormData) {
 
   const phrase = formData.get("phrase") as string;
   const subredditsRaw = formData.get("target_subreddits") as string;
-  const discordWebhookUrl = formData.get("discord_webhook_url") as string;
+  const rawWebhook = formData.get("discord_webhook_url") as string;
+  const discordWebhookUrl = rawWebhook?.trim() ? rawWebhook.trim() : null;
 
   if (!phrase?.trim()) {
     return { error: "Keyword phrase is required." };
   }
   if (!subredditsRaw?.trim()) {
     return { error: "At least one target subreddit is required." };
-  }
-  if (!discordWebhookUrl?.trim()) {
-    return { error: "Discord webhook URL is required." };
   }
 
   // Parse comma-separated subreddits into a clean array
@@ -58,14 +56,14 @@ export async function createKeyword(formData: FormData) {
     .filter(Boolean);
 
   if (targetSubreddits.length === 0) {
-    return { error: "At least one valid subreddit name is required." };
+    return { error: "At least one valid target subreddit is required." };
   }
 
   const { error } = await supabase.from("keywords").insert({
     user_id: user.id,
     phrase: phrase.trim(),
     target_subreddits: targetSubreddits,
-    discord_webhook_url: discordWebhookUrl.trim(),
+    discord_webhook_url: discordWebhookUrl,
   });
 
   if (error) {

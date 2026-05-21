@@ -43,10 +43,10 @@ export async function signup(formData: FormData) {
 
 export async function signInWithGoogle() {
   const supabase = await createClient();
-  const headersList = await headers();
-  const host = headersList.get("host") || "localhost:3000";
-  const protocol = host.includes("localhost") ? "http" : "https";
-  const redirectTo = `${protocol}://${host}/auth/callback`;
+  let url = process.env.NEXT_PUBLIC_SITE_URL ?? process.env.NEXT_PUBLIC_VERCEL_URL ?? "http://localhost:3000";
+  url = url.startsWith("http") ? url : `https://${url}`;
+  url = url.replace(/\/$/, ""); // ensure no trailing slash
+  const redirectTo = `${url}/auth/callback`;
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { login, signInWithGoogle } from "@/app/(auth)/actions";
+import { login } from "@/app/(auth)/actions";
 import { Logo } from "@/app/ui/logo";
 import { Button } from "@/app/ui/button";
 import { Input } from "@/app/ui/input";

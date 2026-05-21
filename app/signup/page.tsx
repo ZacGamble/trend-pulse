@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { signup, signInWithGoogle } from "@/app/(auth)/actions";
+import { signup } from "@/app/(auth)/actions";
 import { Logo } from "@/app/ui/logo";
 import { Button } from "@/app/ui/button";
 import { Input } from "@/app/ui/input";
@@ -24,9 +24,24 @@ export default function SignupPage() {
   async function handleGoogleSignIn() {
     setLoading(true);
     setError(null);
-    const result = await signInWithGoogle();
-    if (result?.error) {
-      setError(result.error);
+    
+    // We use the browser client directly here to avoid Server Action PKCE cookie bugs
+    const { createClient } = await import("@/lib/supabase/client");
+    const supabase = createClient();
+    
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+        queryParams: {
+          access_type: "offline",
+          prompt: "consent",
+        },
+      },
+    });
+
+    if (error) {
+      setError(error.message);
       setLoading(false);
     }
   }

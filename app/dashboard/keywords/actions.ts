@@ -4,6 +4,38 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
+async function validateSubreddits(subreddits: string[]): Promise<string | null> {
+  for (const sub of subreddits) {
+    try {
+      const response = await fetch(`https://www.reddit.com/r/${sub}/about.json`, {
+        headers: {
+          "User-Agent": "TrendPulse/1.0.0 (Validation Check)",
+        },
+        redirect: "manual", // Prevent following the 302 search redirect for missing subs
+      });
+
+      if (response.status === 302) {
+        return `Subreddit "r/${sub}" does not exist.`;
+      }
+
+      if (!response.ok) {
+        if (response.status === 404) return `Subreddit "r/${sub}" does not exist.`;
+        if (response.status === 403) return `Subreddit "r/${sub}" is private or banned.`;
+        return `Subreddit "r/${sub}" is currently inaccessible (Status: ${response.status}).`;
+      }
+
+      const data = await response.json();
+      if (data.kind !== "t5") {
+        return `Subreddit "r/${sub}" does not appear to be a valid, public community.`;
+      }
+    } catch (e) {
+      console.error(`Error validating subreddit r/${sub}:`, e);
+      return `Failed to validate "r/${sub}". Reddit might be blocking the request.`;
+    }
+  }
+  return null;
+}
+
 export async function createKeyword(formData: FormData) {
   const supabase = await createClient();
 
@@ -59,6 +91,11 @@ export async function createKeyword(formData: FormData) {
     return { error: "At least one valid target subreddit is required." };
   }
 
+  const validationError = await validateSubreddits(targetSubreddits);
+  if (validationError) {
+    return { error: validationError };
+  }
+
   const { error } = await supabase.from("keywords").insert({
     user_id: user.id,
     phrase: phrase.trim(),
@@ -112,6 +149,11 @@ export async function updateKeyword(keywordId: number, formData: FormData) {
 
   if (targetSubreddits.length === 0) {
     return { error: "At least one valid target subreddit is required." };
+  }
+
+  const validationError = await validateSubreddits(targetSubreddits);
+  if (validationError) {
+    return { error: validationError };
   }
 
   const { error } = await supabase

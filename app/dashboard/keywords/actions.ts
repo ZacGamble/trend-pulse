@@ -7,13 +7,8 @@ import { createClient } from "@/lib/supabase/server";
 async function validateSubreddits(subreddits: string[]): Promise<string | null> {
   for (const sub of subreddits) {
     try {
-      const response = await fetch(`https://www.reddit.com/r/${sub}/new.json?limit=1&raw_json=1`, {
-        headers: {
-          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-          "Accept": "application/json",
-        },
-        redirect: "manual", // Prevent following the 302 search redirect for missing subs
-      });
+      // Proxy through our Python backend to bypass Reddit's TLS/JA3 fingerprinting
+      const response = await fetch(`https://trend-pulse-production.up.railway.app/api/v1/subreddit/${sub}/new`);
 
       if (response.status === 302) {
         return `Subreddit "r/${sub}" does not exist.`;
@@ -31,7 +26,7 @@ async function validateSubreddits(subreddits: string[]): Promise<string | null> 
       }
     } catch (e) {
       console.error(`Error validating subreddit r/${sub}:`, e);
-      return `Failed to validate "r/${sub}". Reddit might be blocking the request.`;
+      return `Failed to validate "r/${sub}". The backend proxy might be down.`;
     }
   }
   return null;

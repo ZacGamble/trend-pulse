@@ -11,6 +11,7 @@ Implements the 5-step stateless processing pipeline:
 
 import logging
 from fastapi import FastAPI, Header, HTTPException
+from curl_cffi import requests as cffi_requests
 
 from config import settings
 from services.db import get_active_keywords, save_match
@@ -32,6 +33,32 @@ app = FastAPI(
 @app.get("/health")
 async def health_check():
     return {"status": "ok", "service": "trendpulse-engine"}
+
+
+@app.get("/api/v1/subreddit/{subreddit_name}/new")
+def get_reddit_posts_json(subreddit_name: str):
+    """
+    Proxy endpoint for Next.js validation to bypass Cloudflare TLS fingerprinting
+    using curl_cffi. This endpoint returns the raw Reddit JSON.
+    """
+    url = f"https://www.reddit.com/r/{subreddit_name}/new.json"
+    try:
+        response = cffi_requests.get(
+            url, 
+            params={"limit": 1, "raw_json": 1},
+            impersonate="chrome", 
+            timeout=10,
+            allow_redirects=False # Catch missing subreddit 302s
+        )
+        if response.status_code == 302:
+            raise HTTPException(status_code=302, detail="Subreddit does not exist (Redirected)")
+        if response.status_code != 200:
+            raise HTTPException(status_code=response.status_code, detail=f"Reddit returned status code {response.status_code}")
+        return response.json()
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Request failed: {str(e)}")
 
 
 @app.post("/api/v1/cron-check")

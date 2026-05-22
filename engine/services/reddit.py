@@ -11,6 +11,7 @@ checking a handful of subreddits, this is more than sufficient.
 
 import logging
 import re
+import html
 import feedparser
 from config import settings
 
@@ -27,7 +28,6 @@ async def fetch_new_posts(subreddit: str, limit: int = 25) -> list[dict]:
     # feedparser.parse is synchronous but perfectly fast enough for RSS feeds
     feed = feedparser.parse(url)
     
-    # If feedparser fails or gets blocked, feed.entries will be empty
     if not feed.entries:
         logger.warning(f"No entries found for r/{subreddit} (possibly rate limited or blocked)")
         return []
@@ -39,9 +39,13 @@ async def fetch_new_posts(subreddit: str, limit: int = 25) -> list[dict]:
         raw_id = getattr(entry, "id", "")
         post_id = raw_id.split("_")[-1] if "_" in raw_id else raw_id
 
-        # Clean HTML tags from the summary
-        summary_html = getattr(entry, "summary", "")
-        selftext = re.sub(r'<[^>]+>', ' ', summary_html).strip()
+        # Robustly extract content
+        content_list = getattr(entry, "content", [])
+        raw_html = content_list[0].value if content_list else getattr(entry, "summary", "")
+        
+        # Decode any &lt; entities and strip HTML tags cleanly
+        decoded_html = html.unescape(raw_html)
+        selftext = re.sub(r'<[^>]+>', ' ', decoded_html).strip()
 
         posts.append({
             "id": post_id,

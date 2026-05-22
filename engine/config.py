@@ -37,7 +37,7 @@ class Settings(BaseSettings):
 
     # Reddit public JSON scraping (no API key needed)
     # A descriptive user agent is required — Reddit blocks default/empty agents
-    REDDIT_USER_AGENT: str = "TrendPulse/1.0 (automated lead detector)"
+    REDDIT_USER_AGENT: str = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 
     # The moat — proprietary keyword weights and phrases
     # Format: JSON string, e.g. '{"looking for": 3, "need a tool": 5}'

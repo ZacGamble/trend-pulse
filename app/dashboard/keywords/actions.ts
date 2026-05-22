@@ -9,7 +9,7 @@ async function validateSubreddits(subreddits: string[]): Promise<string | null> 
     try {
       const response = await fetch(`https://www.reddit.com/r/${sub}/new.json?limit=1&raw_json=1`, {
         headers: {
-          "User-Agent": "TrendPulse/1.0 (automated lead detector)",
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
           "Accept": "application/json",
         },
         redirect: "manual", // Prevent following the 302 search redirect for missing subs

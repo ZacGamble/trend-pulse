@@ -10,46 +10,45 @@ checking a handful of subreddits, this is more than sufficient.
 """
 
 import logging
-from curl_cffi import requests
+import re
+import feedparser
 from config import settings
 
 logger = logging.getLogger("trendpulse")
 
 async def fetch_new_posts(subreddit: str, limit: int = 25) -> list[dict]:
     """
-    Fetch the latest `limit` posts from a subreddit via the public JSON feed.
+    Fetch the latest `limit` posts from a subreddit via the public RSS feed.
     Returns a list of post dicts with: id, title, selftext, permalink, subreddit.
     All data lives in RAM only.
     """
-    url = f"https://www.reddit.com/r/{subreddit}/new.json"
-
-    async with requests.AsyncSession(impersonate="chrome") as client:
-        response = await client.get(
-            url,
-            params={"limit": limit, "raw_json": 1},
-            timeout=15.0,
-            allow_redirects=True
-        )
-
-        if response.status_code == 429:
-            # Rate limited — return empty list, next cron cycle will retry
-            return []
-
-        if response.status_code != 200:
-            logger.error(f"Reddit API returned {response.status_code} for r/{subreddit}")
-            response.raise_for_status()
+    url = f"https://www.reddit.com/r/{subreddit}/new.rss"
+    
+    # feedparser.parse is synchronous but perfectly fast enough for RSS feeds
+    feed = feedparser.parse(url)
+    
+    # If feedparser fails or gets blocked, feed.entries will be empty
+    if not feed.entries:
+        logger.warning(f"No entries found for r/{subreddit} (possibly rate limited or blocked)")
+        return []
 
     posts = []
-    for child in response.json().get("data", {}).get("children", []):
-        data = child.get("data", {})
-        posts.append(
-            {
-                "id": data.get("id", ""),
-                "title": data.get("title", ""),
-                "selftext": data.get("selftext", ""),
-                "permalink": data.get("permalink", ""),
-                "subreddit": data.get("subreddit", ""),
-            }
-        )
+    # Take up to `limit` entries
+    for entry in feed.entries[:limit]:
+        # Extract the pure ID from the URI (e.g. 'https://www.reddit.com/r/SaaS/t3_1tg0aci' -> '1tg0aci')
+        raw_id = getattr(entry, "id", "")
+        post_id = raw_id.split("_")[-1] if "_" in raw_id else raw_id
+
+        # Clean HTML tags from the summary
+        summary_html = getattr(entry, "summary", "")
+        selftext = re.sub(r'<[^>]+>', ' ', summary_html).strip()
+
+        posts.append({
+            "id": post_id,
+            "title": getattr(entry, "title", ""),
+            "selftext": selftext,
+            "permalink": getattr(entry, "link", ""),
+            "subreddit": subreddit,
+        })
 
     return posts

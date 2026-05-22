@@ -64,10 +64,17 @@ export default async function KeywordsPage() {
       </div>
 
       {atLimit && (
-        <div className="mb-6 rounded-xl border border-amber-500/20 bg-amber-500/5 px-4 py-3 text-sm text-amber-400">
-          <strong>Free-tier limit reached.</strong> You&apos;re using your 1 keyword
-          tracker. Delete the existing one or upgrade to premium for unlimited
-          trackers.
+        <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-xl border border-amber-500/20 bg-amber-500/5 px-4 py-3 text-sm text-amber-400">
+          <div>
+            <strong>Free-tier limit reached.</strong> You&apos;re using your 1 keyword
+            tracker. Delete the existing one or upgrade to premium for unlimited
+            trackers.
+          </div>
+          <form action="/api/billing/checkout" method="POST">
+            <Button type="submit" className="whitespace-nowrap bg-amber-500 text-amber-950 hover:bg-amber-400 hover:brightness-100 shadow-none text-xs h-8 px-4">
+              Upgrade to Premium
+            </Button>
+          </form>
         </div>
       )}
 

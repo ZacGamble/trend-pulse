@@ -5,6 +5,7 @@ import { NavLink } from "@/app/ui/nav-link";
 import { LogoutButton } from "@/app/dashboard/logout-button";
 
 import { MobileNav } from "@/app/dashboard/mobile-nav";
+import { BillingForm } from "@/app/dashboard/billing-form";
 
 export default async function DashboardLayout({
   children,
@@ -21,9 +22,17 @@ export default async function DashboardLayout({
     redirect("/login");
   }
 
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("tier")
+    .eq("id", user.id)
+    .single();
+
+  const tier = profile?.tier || "free";
+
   return (
     <div className="flex min-h-screen flex-col md:flex-row">
-      <MobileNav email={user.email || ""} />
+      <MobileNav email={user.email || ""} tier={tier} />
       
       {/* Sidebar - Desktop Only */}
       <aside className="hidden md:flex fixed left-0 top-0 z-40 h-screen w-64 flex-col border-r border-card-border bg-card/50 backdrop-blur-xl">
@@ -55,6 +64,7 @@ export default async function DashboardLayout({
         </nav>
 
         <div className="border-t border-card-border p-4">
+          <BillingForm tier={tier} />
           <div className="mb-3 truncate text-xs text-muted-foreground">
             {user.email}
           </div>

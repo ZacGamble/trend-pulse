@@ -5,7 +5,9 @@ import { Logo } from "@/app/ui/logo";
 import { NavLink } from "@/app/ui/nav-link";
 import { LogoutButton } from "@/app/dashboard/logout-button";
 
-export function MobileNav({ email }: { email: string }) {
+import { BillingForm } from "@/app/dashboard/billing-form";
+
+export function MobileNav({ email, tier }: { email: string, tier: string }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -55,6 +57,7 @@ export function MobileNav({ email }: { email: string }) {
             </div>
           </nav>
           <div className="border-t border-card-border p-4 bg-background">
+            <BillingForm tier={tier} />
             <div className="mb-3 truncate text-xs text-muted-foreground">
               {email}
             </div>

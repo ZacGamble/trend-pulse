@@ -36,7 +36,7 @@ export default async function MatchesPage() {
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
                   <a
-                    href={`https://reddit.com${match.permalink}`}
+                    href={`${match.permalink}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-base font-semibold text-foreground hover:text-accent-light transition-colors"

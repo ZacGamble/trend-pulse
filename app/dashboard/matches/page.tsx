@@ -1,5 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
-import { Card } from "@/app/ui/card";
+import { Card, CardTitle, CardValue } from "@/app/ui/card";
+import Link from "next/link";
+import { Button } from "@/app/ui/button";
 
 export default async function MatchesPage() {
   const supabase = await createClient();
@@ -7,6 +9,38 @@ export default async function MatchesPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  // Fetch stats in parallel
+  const [keywordsResult, matchesResult, latestMatchResult] = await Promise.all([
+    supabase
+      .from("keywords")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user!.id),
+    supabase
+      .from("matches")
+      .select("id, keywords!inner(user_id)", { count: "exact", head: true })
+      .eq("keywords.user_id", user!.id),
+    supabase
+      .from("matches")
+      .select("matched_at, keywords!inner(user_id)")
+      .eq("keywords.user_id", user!.id)
+      .order("matched_at", { ascending: false })
+      .limit(1),
+  ]);
+
+  const keywordCount = keywordsResult.count ?? 0;
+  const matchCount = matchesResult.count ?? 0;
+  const lastMatch = latestMatchResult.data?.[0]?.matched_at
+    ? new Date(latestMatchResult.data[0].matched_at).toLocaleDateString(
+        "en-US",
+        {
+          month: "short",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        }
+      )
+    : "No matches yet";
 
   const { data: matches } = await supabase
     .from("matches")
@@ -17,13 +51,52 @@ export default async function MatchesPage() {
 
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold tracking-tight text-foreground">
-          Matches
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          All detected leads from your keyword trackers.
-        </p>
+      <div className="mb-8 flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">
+            Matches
+          </h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            All detected leads from your keyword trackers.
+          </p>
+        </div>
+        <Link href="/dashboard/keywords/new">
+          <Button className="gap-2">
+            <svg
+              className="h-4 w-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2}
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 4.5v15m7.5-7.5h-15"
+              />
+            </svg>
+            Create Tracker
+          </Button>
+        </Link>
+      </div>
+
+      <div className="grid gap-6 sm:grid-cols-3 mb-8">
+        <Card className="animate-fade-in">
+          <CardTitle>Active Keywords</CardTitle>
+          <CardValue>{keywordCount}</CardValue>
+        </Card>
+
+        <Card className="animate-fade-in delay-100">
+          <CardTitle>Total Matches</CardTitle>
+          <CardValue>{matchCount}</CardValue>
+        </Card>
+
+        <Card className="animate-fade-in delay-200">
+          <CardTitle>Last Match</CardTitle>
+          <CardValue>
+            <span className="text-lg">{lastMatch}</span>
+          </CardValue>
+        </Card>
       </div>
 
       {matches && matches.length > 0 ? (

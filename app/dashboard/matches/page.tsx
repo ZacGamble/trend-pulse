@@ -61,9 +61,9 @@ export default async function MatchesPage() {
           </p>
         </div>
         <Link href="/dashboard/keywords/new">
-          <Button className="gap-2">
+          <Button className="!p-0 md:!px-5 md:!py-2.5 h-10 w-10 md:h-auto md:w-auto md:gap-2">
             <svg
-              className="h-4 w-4"
+              className="h-5 w-5 md:h-4 md:w-4"
               fill="none"
               viewBox="0 0 24 24"
               strokeWidth={2}
@@ -75,7 +75,7 @@ export default async function MatchesPage() {
                 d="M12 4.5v15m7.5-7.5h-15"
               />
             </svg>
-            Create Tracker
+            <span className="hidden md:inline">Create Tracker</span>
           </Button>
         </Link>
       </div>

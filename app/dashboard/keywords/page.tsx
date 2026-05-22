@@ -29,7 +29,7 @@ export default async function KeywordsPage() {
 
   return (
     <div>
-      <div className="mb-8 flex items-center justify-between">
+      <div className="mb-8 flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground">
             Keywords
@@ -41,20 +41,23 @@ export default async function KeywordsPage() {
 
         {atLimit ? (
           <div className="flex items-center gap-3">
-            <span className="text-xs text-muted-foreground border border-input-border rounded-lg px-3 py-1.5">
+            <span className="hidden md:inline text-xs text-muted-foreground border border-input-border rounded-lg px-3 py-1.5">
               Free tier: 1/1 keyword used
             </span>
-            <Button disabled className="opacity-50 cursor-not-allowed">
-              Add Keyword
+            <Button disabled className="!p-0 md:!px-5 md:!py-2.5 h-10 w-10 md:h-auto md:w-auto md:gap-2 opacity-50 cursor-not-allowed">
+              <svg className="h-5 w-5 md:h-4 md:w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+              </svg>
+              <span className="hidden md:inline">Add Keyword</span>
             </Button>
           </div>
         ) : (
           <Link href="/dashboard/keywords/new">
-            <Button>
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+            <Button className="!p-0 md:!px-5 md:!py-2.5 h-10 w-10 md:h-auto md:w-auto md:gap-2">
+              <svg className="h-5 w-5 md:h-4 md:w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
               </svg>
-              Add Keyword
+              <span className="hidden md:inline">Add Keyword</span>
             </Button>
           </Link>
         )}
@@ -72,7 +75,7 @@ export default async function KeywordsPage() {
         <div className="grid gap-4">
           {keywords.map((keyword) => (
             <Card key={keyword.id} className="animate-fade-in">
-              <div className="flex items-start justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                 <div className="flex-1">
                   <h3 className="text-lg font-semibold text-foreground">
                     &ldquo;{keyword.phrase}&rdquo;
@@ -99,7 +102,7 @@ export default async function KeywordsPage() {
                     })}
                   </p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 sm:mt-0">
                   <Link href={`/dashboard/keywords/${keyword.id}/edit`}>
                     <Button variant="secondary" className="h-9 px-3 text-xs">
                       Edit

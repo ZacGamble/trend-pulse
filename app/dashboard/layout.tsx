@@ -4,6 +4,8 @@ import { Logo } from "@/app/ui/logo";
 import { NavLink } from "@/app/ui/nav-link";
 import { LogoutButton } from "@/app/dashboard/logout-button";
 
+import { MobileNav } from "@/app/dashboard/mobile-nav";
+
 export default async function DashboardLayout({
   children,
 }: {
@@ -20,24 +22,16 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="flex min-h-screen">
-      {/* Sidebar */}
-      <aside className="fixed left-0 top-0 z-40 flex h-screen w-64 flex-col border-r border-card-border bg-card/50 backdrop-blur-xl">
+    <div className="flex min-h-screen flex-col md:flex-row">
+      <MobileNav email={user.email || ""} />
+      
+      {/* Sidebar - Desktop Only */}
+      <aside className="hidden md:flex fixed left-0 top-0 z-40 h-screen w-64 flex-col border-r border-card-border bg-card/50 backdrop-blur-xl">
         <div className="flex h-16 items-center px-6 border-b border-card-border">
           <Logo />
         </div>
 
         <nav className="flex flex-1 flex-col gap-1 p-4">
-          {/* <NavLink
-            href="/dashboard"
-            icon={
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" />
-              </svg>
-            }
-          >
-            Overview
-          </NavLink> */}
           <NavLink
             href="/dashboard/matches"
             icon={
@@ -69,7 +63,7 @@ export default async function DashboardLayout({
       </aside>
 
       {/* Main content */}
-      <main className="ml-64 flex-1 p-8">{children}</main>
+      <main className="flex-1 p-4 md:ml-64 md:p-8">{children}</main>
     </div>
   );
 }

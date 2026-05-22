@@ -29,7 +29,11 @@ export async function POST(req: Request) {
       return_url: `${process.env.NEXT_PUBLIC_SITE_URL}/dashboard/matches`,
     });
 
-    return NextResponse.json({ url: portalSession.url });
+    if (portalSession.url) {
+      return NextResponse.redirect(portalSession.url, 303);
+    }
+
+    return new NextResponse('Error creating portal session', { status: 500 });
   } catch (error: any) {
     return new NextResponse(JSON.stringify({ error: error.message }), { status: 500 });
   }

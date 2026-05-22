@@ -23,7 +23,11 @@ export async function POST(req: Request) {
       metadata: { user_id: user.id }, // Critically binds transaction back to DB primary key
     });
 
-    return NextResponse.json({ url: session.url });
+    if (session.url) {
+      return NextResponse.redirect(session.url, 303);
+    }
+    
+    return new NextResponse('Error creating checkout session', { status: 500 });
   } catch (error: any) {
     return new NextResponse(JSON.stringify({ error: error.message }), { status: 500 });
   }

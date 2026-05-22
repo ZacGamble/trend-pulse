@@ -31,7 +31,7 @@ export async function POST(req: Request) {
         const userId = session.metadata?.user_id;
 
         if (userId) {
-          await supabaseAdmin
+          const { error } = await supabaseAdmin
             .from('profiles')
             .update({
               stripe_customer_id: session.customer as string,
@@ -39,6 +39,14 @@ export async function POST(req: Request) {
               tier: 'premium',
             })
             .eq('id', userId);
+            
+          if (error) {
+            console.error('Supabase Update Error:', error);
+          } else {
+            console.log(`Successfully upgraded user ${userId} to premium!`);
+          }
+        } else {
+          console.error('No user_id found in session metadata');
         }
         break;
       }

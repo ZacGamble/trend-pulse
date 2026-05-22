@@ -28,7 +28,7 @@ export default async function DashboardLayout({
         </div>
 
         <nav className="flex flex-1 flex-col gap-1 p-4">
-          <NavLink
+          {/* <NavLink
             href="/dashboard"
             icon={
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
@@ -37,6 +37,16 @@ export default async function DashboardLayout({
             }
           >
             Overview
+          </NavLink> */}
+          <NavLink
+            href="/dashboard/matches"
+            icon={
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z" />
+              </svg>
+            }
+          >
+            Matches
           </NavLink>
           <NavLink
             href="/dashboard/keywords"
@@ -47,16 +57,6 @@ export default async function DashboardLayout({
             }
           >
             Keywords
-          </NavLink>
-          <NavLink
-            href="/dashboard/matches"
-            icon={
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z" />
-              </svg>
-            }
-          >
-            Matches
           </NavLink>
         </nav>
 

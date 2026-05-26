@@ -59,6 +59,3 @@ curl -X POST http://localhost:8000/api/v1/cron-check \
 
 ## ☁️ Deployment (Railway)
 When deploying the engine to Railway, you **must** explicitly define `PORT=8000` in the Railway Variables tab. Railway's edge proxy will return a `502 Bad Gateway` if the internal port mappings don't explicitly align with the container.
-
-## 📝 License
-MIT License

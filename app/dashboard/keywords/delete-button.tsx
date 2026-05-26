@@ -1,21 +1,36 @@
 "use client";
 
-import { deleteKeyword } from "./actions";
+import { useDashboard } from "@/app/dashboard/dashboard-context";
 import { Button } from "@/app/ui/button";
 import { useState } from "react";
 
 export function DeleteKeywordButton({ keywordId }: { keywordId: number }) {
   const [confirming, setConfirming] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const { deleteKeyword } = useDashboard();
 
   if (confirming) {
     return (
       <div className="flex items-center gap-2">
-        <span className="text-xs text-danger">Delete?</span>
+        <span className="text-xs text-danger">{isDeleting ? "Deleting..." : "Delete?"}</span>
         <Button
           variant="danger"
           className="text-xs px-3 py-1.5"
+          disabled={isDeleting}
           onClick={async () => {
-            await deleteKeyword(keywordId);
+            setIsDeleting(true);
+            try {
+              const res = await deleteKeyword(keywordId);
+              if (res?.error) {
+                alert(res.error);
+                setIsDeleting(false);
+                setConfirming(false);
+              }
+            } catch (err) {
+              console.error(err);
+              setIsDeleting(false);
+              setConfirming(false);
+            }
           }}
         >
           Yes
@@ -23,6 +38,7 @@ export function DeleteKeywordButton({ keywordId }: { keywordId: number }) {
         <Button
           variant="ghost"
           className="text-xs px-3 py-1.5"
+          disabled={isDeleting}
           onClick={() => setConfirming(false)}
         >
           No

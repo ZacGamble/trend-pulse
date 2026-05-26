@@ -1,30 +1,34 @@
+"use client";
+
+import { useEffect } from "react";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/app/ui/button";
 import { Card } from "@/app/ui/card";
 import { DeleteKeywordButton } from "./delete-button";
+import { useDashboard } from "@/app/dashboard/dashboard-context";
 
-export default async function KeywordsPage() {
-  const supabase = await createClient();
+function MockKeywordCard() {
+  return (
+    <div className="glass rounded-2xl p-6 border border-dashed border-accent/20 bg-accent/5 animate-pulse flex flex-col gap-3">
+      <div className="h-6 w-48 rounded bg-white/5 animate-pulse" />
+      <div className="flex gap-2">
+        <div className="h-5 w-16 rounded bg-white/5 animate-pulse" />
+        <div className="h-5 w-16 rounded bg-white/5 animate-pulse" />
+      </div>
+      <div className="h-4 w-72 rounded bg-white/5 animate-pulse" />
+      <div className="h-4 w-24 rounded bg-white/5 animate-pulse" />
+    </div>
+  );
+}
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+export default function KeywordsPage() {
+  const { keywords, isKeywordsLoading, tier, fetchKeywords } = useDashboard();
 
-  const { data: keywords } = await supabase
-    .from("keywords")
-    .select("*")
-    .eq("user_id", user!.id)
-    .order("created_at", { ascending: false });
+  useEffect(() => {
+    fetchKeywords();
+  }, [fetchKeywords]);
 
-  // Check if user can add more keywords
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("tier")
-    .eq("id", user!.id)
-    .single();
-
-  const isFree = profile?.tier === "free";
+  const isFree = tier === "free";
   const atLimit = isFree && (keywords?.length ?? 0) >= 1;
 
   return (
@@ -78,7 +82,11 @@ export default async function KeywordsPage() {
         </div>
       )}
 
-      {keywords && keywords.length > 0 ? (
+      {isKeywordsLoading && !keywords ? (
+        <div className="grid gap-4">
+          <MockKeywordCard />
+        </div>
+      ) : keywords && keywords.length > 0 ? (
         <div className="grid gap-4">
           {keywords.map((keyword) => (
             <Card key={keyword.id} className="animate-fade-in">
@@ -97,9 +105,11 @@ export default async function KeywordsPage() {
                       </span>
                     ))}
                   </div>
-                  <p className="mt-2 truncate text-xs text-muted">
-                    Webhook: {keyword.discord_webhook_url}
-                  </p>
+                  {keyword.discord_webhook_url && (
+                    <p className="mt-2 truncate text-xs text-muted">
+                      Webhook: {keyword.discord_webhook_url}
+                    </p>
+                  )}
                   <p className="mt-1 text-xs text-muted">
                     Created{" "}
                     {new Date(keyword.created_at).toLocaleDateString("en-US", {

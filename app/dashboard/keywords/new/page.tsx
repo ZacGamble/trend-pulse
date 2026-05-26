@@ -7,11 +7,13 @@ import { createKeyword, triggerEngineScrape } from "../actions";
 import { Button } from "@/app/ui/button";
 import { Input } from "@/app/ui/input";
 import { Card } from "@/app/ui/card";
+import { useDashboard } from "@/app/dashboard/dashboard-context";
 
 export default function NewKeywordPage() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [loadingStep, setLoadingStep] = useState<"idle" | "saving" | "fetching">("idle");
+  const { refreshKeywords, refreshStats, refreshMatches } = useDashboard();
 
   async function handleSubmit(formData: FormData) {
     setLoadingStep("saving");
@@ -24,6 +26,11 @@ export default function NewKeywordPage() {
       setLoadingStep("idle");
       return;
     }
+
+    // Refresh dashboard client context so cached data isn't stale
+    refreshKeywords();
+    refreshStats();
+    refreshMatches();
 
     // Step 2: Trigger the scrape
     setLoadingStep("fetching");

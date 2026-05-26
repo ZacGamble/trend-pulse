@@ -7,11 +7,13 @@ import { updateKeyword, triggerEngineScrape } from "../../actions";
 import { Button } from "@/app/ui/button";
 import { Input } from "@/app/ui/input";
 import { Card } from "@/app/ui/card";
+import { useDashboard } from "@/app/dashboard/dashboard-context";
 
 export function EditKeywordForm({ keyword }: { keyword: any }) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [loadingStep, setLoadingStep] = useState<"idle" | "saving" | "fetching">("idle");
+  const { refreshKeywords, refreshMatches, refreshStats } = useDashboard();
 
   async function handleSubmit(formData: FormData) {
     setLoadingStep("saving");
@@ -24,6 +26,11 @@ export function EditKeywordForm({ keyword }: { keyword: any }) {
       setLoadingStep("idle");
       return;
     }
+
+    // Refresh client state context caches so they reflect modifications
+    refreshKeywords();
+    refreshMatches();
+    refreshStats();
 
     // Step 2: Trigger the scrape so engine picks up changes
     setLoadingStep("fetching");

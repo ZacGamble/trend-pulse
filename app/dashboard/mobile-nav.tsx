@@ -4,18 +4,28 @@ import { useState } from "react";
 import { Logo } from "@/app/ui/logo";
 import { NavLink } from "@/app/ui/nav-link";
 import { LogoutButton } from "@/app/dashboard/logout-button";
-
 import { BillingForm } from "@/app/dashboard/billing-form";
+import { useDashboard } from "@/app/dashboard/dashboard-context";
 
 export function MobileNav({ email, tier }: { email: string, tier: string }) {
   const [isOpen, setIsOpen] = useState(false);
+  const { prefetchMatches, prefetchKeywords } = useDashboard();
+
+  const handleToggle = () => {
+    const nextOpen = !isOpen;
+    setIsOpen(nextOpen);
+    if (nextOpen) {
+      prefetchMatches(1);
+      prefetchKeywords();
+    }
+  };
 
   return (
     <>
       <header className="md:hidden sticky top-0 z-50 flex h-16 items-center justify-between border-b border-card-border bg-background/80 px-4 backdrop-blur-xl">
         <Logo />
         <button
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={handleToggle}
           className="text-muted-foreground hover:text-foreground"
         >
           <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
